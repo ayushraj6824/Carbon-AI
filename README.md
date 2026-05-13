@@ -6,9 +6,7 @@ Built as a comprehensive MCA Major Project, this platform bridges the gap betwee
 
 ---
 
-## 📸 Screenshots
 
-*(Placeholders for project screenshots. Add images to the `screenshots/` directory and uncomment below)*
 
 <!--
 | Dashboard | Validation Result |
