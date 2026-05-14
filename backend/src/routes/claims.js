@@ -1,10 +1,11 @@
 const express = require('express');
-const axios   = require('axios');
-const Claim   = require('../models/Claim');
+const axios = require('axios');
+const Claim = require('../models/Claim');
 const protect = require('../middleware/authMiddleware');
 
-const router     = express.Router();
-const ML_URL     = () => process.env.ML_SERVICE_URL || 'http://localhost:5001';
+const router = express.Router();
+
+const ML_URL = process.env.ML_SERVICE_URL || 'http://localhost:5001';
 
 // ── POST /api/claims/validate ─────────────────────────────────────────────
 router.post('/validate', protect, async (req, res) => {
@@ -34,7 +35,7 @@ router.post('/validate', protect, async (req, res) => {
     };
 
     // Call Python ML service
-    const mlRes = await axios.post(`${ML_URL()}/predict`, mlPayload);
+    const mlRes = await axios.post(`${ML_URL}/predict`, mlPayload);
 
     const {
       predictedEmission, anomalyScore,
