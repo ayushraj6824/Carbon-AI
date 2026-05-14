@@ -1,5 +1,6 @@
-const jwt  = require('jsonwebtoken');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import { ENV } from '../config/env.js';
 
 const protect = async (req, res, next) => {
   try {
@@ -9,7 +10,7 @@ const protect = async (req, res, next) => {
     }
 
     const token   = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'carbon_ai_secret');
+    const decoded = jwt.verify(token, ENV.JWT_SECRET);
     const user    = await User.findById(decoded.id).select('-password');
 
     if (!user) {
@@ -23,4 +24,4 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = protect;
+export default protect;

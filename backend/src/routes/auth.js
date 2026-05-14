@@ -1,13 +1,14 @@
-const express = require('express');
-const jwt     = require('jsonwebtoken');
-const User    = require('../models/User');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import { ENV } from '../config/env.js';
 
 const router = express.Router();
 
 const generateToken = (userId) =>
   jwt.sign(
     { id: userId },
-    process.env.JWT_SECRET || 'carbon_ai_secret',
+    ENV.JWT_SECRET || 'carbon_ai_secret',
     { expiresIn: '7d' }
   );
 
@@ -55,4 +56,4 @@ router.post('/login', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,10 +1,9 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-
-const authRoutes = require("./routes/auth");
-const claimsRoutes = require("./routes/claims");
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import { ENV } from "./config/env.js";
+import authRoutes from "./routes/auth.js";
+import claimsRoutes from "./routes/claims.js";
 
 const app = express();
 
@@ -16,7 +15,7 @@ app.use(
       "http://localhost:5174",
       "http://localhost:3000",
       "http://localhost:3001",
-      'https://neuralcarbon.vercel.app',
+      "https://neuralcarbon.vercel.app",
     ],
     credentials: true,
   }),
@@ -28,23 +27,19 @@ app.use("/api/auth", authRoutes);
 app.use("/api/claims", claimsRoutes);
 
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", service: "Carbon AI Backend", port: 5000 });
+  res.json({ status: "ok", service: "Carbon AI Backend", port: ENV.PORT });
 });
 
 // ── MongoDB + Server start ────────────────────────────────────────────────────
-const MONGO_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/carbon_ai";
-const PORT = process.env.PORT || 5000;
-
 (async () => {
   const { default: ora } = await import("ora");
   const mongoSpinner = ora("Connecting to MongoDB...").start();
 
   try {
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(ENV.MONGODB_URI);
     mongoSpinner.succeed("✅ MongoDB connected");
-    app.listen(PORT, () =>
-      console.log(`🚀 Backend running on http://localhost:${PORT}`),
+    app.listen(ENV.PORT, () =>
+      console.log(`🚀 Backend running on http://localhost:${ENV.PORT}`),
     );
   } catch (err) {
     mongoSpinner.fail(`❌ MongoDB connection error: ${err.message}`);

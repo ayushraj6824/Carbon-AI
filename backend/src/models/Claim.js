@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const claimSchema = new mongoose.Schema(
   {
@@ -33,4 +33,4 @@ const claimSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Claim', claimSchema);
+export default mongoose.model('Claim', claimSchema);
