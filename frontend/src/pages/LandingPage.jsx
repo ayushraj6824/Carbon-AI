@@ -238,7 +238,7 @@ export default function LandingPage() {
 
           {/* Key metrics row */}
           <div style={{ display: 'flex', gap: 0, flexWrap: 'wrap', borderTop: `1px solid ${BORDER}`, paddingTop: 28 }}>
-            {[['18,250+', 'Training records'], ['R² 0.88', 'Model accuracy'], ['< 1 s', 'Validation latency'], ['2 roles', 'Company · Auditor']].map(([v, l], i) => (
+            {[['18,250+', 'Training records'], ['R² 0.88', 'Model accuracy'], ['< 1 s', 'Validation latency'],].map(([v, l], i) => (
               <div key={i} style={{
                 paddingRight: 36, paddingLeft: i > 0 ? 36 : 0,
                 borderLeft: i > 0 ? `1px solid ${BORDER}` : 'none',
