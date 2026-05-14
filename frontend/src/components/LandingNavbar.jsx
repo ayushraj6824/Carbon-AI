@@ -141,20 +141,43 @@ export default function LandingNavbar() {
                 }}>{l.label}</button>
             ))}
             <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-              <Link to="/login" style={{
-                flex: 1, textAlign: 'center', padding: '10px', borderRadius: 7,
-                border: '1px solid rgba(255,255,255,0.12)', color: '#fff',
-                textDecoration: 'none', fontSize: '0.875rem',
-              }}>Sign In</Link>
-              <Link to="/register" style={{
-                flex: 1, textAlign: 'center', padding: '10px', borderRadius: 7,
-                background: '#00d4aa', color: '#080e1a', fontWeight: 700,
-                textDecoration: 'none', fontSize: '0.875rem',
-              }}>Get Started</Link>
+              {token ? (
+                <button onClick={() => { setMenuOpen(false); navigate('/dashboard') }}
+                  style={{
+                    flex: 1, textAlign: 'center', padding: '10px', borderRadius: 7,
+                    background: '#00d4aa', color: '#080e1a', fontWeight: 700,
+                    border: 'none', cursor: 'pointer', fontSize: '0.875rem',
+                  }}
+                >Go to Dashboard</button>
+              ) : (
+                <>
+                  <Link to="/login" style={{
+                    flex: 1, textAlign: 'center', padding: '10px', borderRadius: 7,
+                    border: '1px solid rgba(255,255,255,0.12)', color: '#fff',
+                    textDecoration: 'none', fontSize: '0.875rem',
+                  }}>Sign In</Link>
+                  <Link to="/register" style={{
+                    flex: 1, textAlign: 'center', padding: '10px', borderRadius: 7,
+                    background: '#00d4aa', color: '#080e1a', fontWeight: 700,
+                    textDecoration: 'none', fontSize: '0.875rem',
+                  }}>Get Started</Link>
+                </>
+              )}
             </div>
           </div>
         )}
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 768px) {
+          .hidden-mobile { display: none !important; }
+          .show-mobile { display: flex !important; }
+        }
+        @media (min-width: 769px) {
+          .hidden-mobile { display: flex !important; }
+          .show-mobile { display: none !important; }
+        }
+      `}} />
     </nav>
   )
 }

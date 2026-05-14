@@ -24,6 +24,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
 } from '@/components/ui/chart'
 
 const COLORS = [
@@ -46,8 +48,8 @@ const statusVariant = (status) => {
 const HOVER_CARD = "transition-all duration-200 hover:bg-muted/50 hover:shadow-md hover:ring-1 hover:ring-border"
 
 const barChartConfig = {
-  Claimed: { label: 'Claimed', color: 'hsl(var(--chart-1))' },
-  Predicted: { label: 'Predicted', color: 'hsl(var(--chart-2))' },
+  Claimed: { label: 'Claimed', color: 'hsl(var(--chart-3))' },
+  Predicted: { label: 'Predicted', color: 'hsl(var(--chart-1))' },
 }
 
 export default function ClaimHistory() {
@@ -263,10 +265,11 @@ export default function ClaimHistory() {
                 />
                 <ChartTooltip
                   cursor={false}
-                  content={<ChartTooltipContent indicator="dashed" />}
+                  content={<ChartTooltipContent />}
                 />
                 <Bar dataKey="Claimed" fill="var(--color-Claimed)" radius={4} />
                 <Bar dataKey="Predicted" fill="var(--color-Predicted)" radius={4} />
+                <ChartLegend content={<ChartLegendContent />} />
               </BarChart>
             </ChartContainer>
           </CardContent>

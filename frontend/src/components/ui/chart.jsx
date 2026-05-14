@@ -73,13 +73,13 @@ const ChartStyle = ({
           .map(([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
-.map(([key, itemConfig]) => {
-const color =
-  itemConfig.theme?.[theme] ??
-  itemConfig.color
-return color ? `  --color-${key}: ${color};` : null
-})
-.join("\n")}
+              .map(([key, itemConfig]) => {
+                const color =
+                  itemConfig.theme?.[theme] ??
+                  itemConfig.color
+                return color ? `  --color-${key}: ${color};` : null
+              })
+              .join("\n")}
 }
 `)
           .join("\n"),
@@ -179,7 +179,7 @@ function ChartTooltipContent({
                     ) : (
                       !hideIndicator && (
                         <div
-                          className={cn("shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)", {
+                          className={cn("shrink-0 rounded-[2px] border-[var(--color-border)] bg-[var(--color-bg)]", {
                             "h-2.5 w-2.5": indicator === "dot",
                             "w-1": indicator === "line",
                             "w-0 border-[1.5px] border-dashed bg-transparent":
@@ -285,8 +285,8 @@ function getPayloadConfigFromPayload(
 
   const payloadPayload =
     "payload" in payload &&
-    typeof payload.payload === "object" &&
-    payload.payload !== null
+      typeof payload.payload === "object" &&
+      payload.payload !== null
       ? payload.payload
       : undefined
 

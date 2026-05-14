@@ -39,6 +39,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
 } from '@/components/ui/chart'
 
 const SECTORS = [
@@ -203,11 +205,11 @@ export default function Dashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Carbon Claim Dashboard
         </h1>
 
-        <p className="text-muted-foreground mt-2">
+        <p className="text-sm text-muted-foreground mt-2">
           Welcome,{" "}
           <span className="font-medium text-primary">
             {user?.name}
@@ -497,6 +499,7 @@ export default function Dashboard() {
                     <Cell fill="hsl(var(--chart-1))" />
                     <Cell fill="hsl(var(--chart-2))" />
                   </Bar>
+                  <ChartLegend content={<ChartLegendContent />} />
                 </BarChart>
               </ChartContainer>
             </CardContent>
@@ -529,6 +532,7 @@ export default function Dashboard() {
                     <Cell fill="hsl(var(--chart-1))" />
                     <Cell fill="hsl(var(--chart-2))" />
                   </Bar>
+                  <ChartLegend content={<ChartLegendContent />} />
                 </BarChart>
               </ChartContainer>
             </CardContent>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LandingNavbar from '../components/LandingNavbar'
+import { useAuth } from '../context/AuthContext'
 import {
   BarChart3Icon,
   SearchIcon,
@@ -138,6 +139,8 @@ const FOOTER_COLS = [
 
 /* ── COMPONENT ─────────────────────────────────────────────────────────────── */
 export default function LandingPage() {
+  const { token } = useAuth()
+  const navigate = useNavigate()
   const [featRef, featVis] = useReveal()
   const [workRef, workVis] = useReveal()
   const [statRef, statVis] = useReveal()
@@ -198,25 +201,39 @@ export default function LandingPage() {
 
           {/* CTAs */}
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 64 }}>
-            <Link to="/register" style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '11px 26px', borderRadius: 8,
-              background: TEAL, color: '#080e1a', fontWeight: 700,
-              fontSize: '0.9rem', textDecoration: 'none', letterSpacing: '-0.01em',
-              transition: 'opacity 0.2s ease',
-            }}
-              onMouseEnter={e => e.target.style.opacity = '0.88'}
-              onMouseLeave={e => e.target.style.opacity = '1'}
-            >Get Started <ArrowRightIcon className="size-4" /></Link>
-            <Link to="/login" style={{
-              display: 'inline-block', padding: '11px 24px', borderRadius: 8,
-              background: 'rgba(255,255,255,0.055)', color: 'rgba(255,255,255,0.8)',
-              border: `1px solid ${BORDER}`, fontWeight: 500,
-              fontSize: '0.9rem', textDecoration: 'none',
-              transition: 'border-color 0.2s ease, color 0.2s ease',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,212,170,0.35)'; e.currentTarget.style.color = '#fff' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = 'rgba(255,255,255,0.8)' }}
-            >Sign In</Link>
+            {token ? (
+              <button onClick={() => navigate('/dashboard')} style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '11px 26px', borderRadius: 8,
+                background: TEAL, color: '#080e1a', fontWeight: 700, border: 'none', cursor: 'pointer',
+                fontSize: '0.9rem', textDecoration: 'none', letterSpacing: '-0.01em',
+                transition: 'opacity 0.2s ease',
+              }}
+                onMouseEnter={e => e.target.style.opacity = '0.88'}
+                onMouseLeave={e => e.target.style.opacity = '1'}
+              >Go to Dashboard <ArrowRightIcon className="size-4" /></button>
+            ) : (
+              <>
+                <Link to="/register" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '11px 26px', borderRadius: 8,
+                  background: TEAL, color: '#080e1a', fontWeight: 700,
+                  fontSize: '0.9rem', textDecoration: 'none', letterSpacing: '-0.01em',
+                  transition: 'opacity 0.2s ease',
+                }}
+                  onMouseEnter={e => e.target.style.opacity = '0.88'}
+                  onMouseLeave={e => e.target.style.opacity = '1'}
+                >Get Started <ArrowRightIcon className="size-4" /></Link>
+                <Link to="/login" style={{
+                  display: 'inline-block', padding: '11px 24px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.055)', color: 'rgba(255,255,255,0.8)',
+                  border: `1px solid ${BORDER}`, fontWeight: 500,
+                  fontSize: '0.9rem', textDecoration: 'none',
+                  transition: 'border-color 0.2s ease, color 0.2s ease',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,212,170,0.35)'; e.currentTarget.style.color = '#fff' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = 'rgba(255,255,255,0.8)' }}
+                >Sign In</Link>
+              </>
+            )}
           </div>
 
           {/* Key metrics row */}
@@ -376,23 +393,37 @@ export default function LandingPage() {
               Create an account to access the full validation dashboard, claim history, and analytics tools.
             </p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/register" style={{
-                display: 'inline-block', padding: '11px 28px', borderRadius: 8,
-                background: TEAL, color: '#080e1a', fontWeight: 700, fontSize: '0.9rem',
-                textDecoration: 'none', transition: 'opacity 0.2s',
-              }}
-                onMouseEnter={e => e.target.style.opacity = '0.88'}
-                onMouseLeave={e => e.target.style.opacity = '1'}
-              >Create Account</Link>
-              <Link to="/login" style={{
-                display: 'inline-block', padding: '11px 24px', borderRadius: 8,
-                background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.75)',
-                border: `1px solid ${BORDER}`, fontWeight: 500, fontSize: '0.9rem',
-                textDecoration: 'none', transition: 'border-color 0.2s',
-              }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(0,212,170,0.3)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = BORDER}
-              >Sign In</Link>
+              {token ? (
+                <button onClick={() => navigate('/dashboard')} style={{
+                  display: 'inline-block', padding: '11px 28px', borderRadius: 8,
+                  background: TEAL, color: '#080e1a', fontWeight: 700, fontSize: '0.9rem',
+                  border: 'none', cursor: 'pointer',
+                  textDecoration: 'none', transition: 'opacity 0.2s',
+                }}
+                  onMouseEnter={e => e.target.style.opacity = '0.88'}
+                  onMouseLeave={e => e.target.style.opacity = '1'}
+                >Go to Dashboard</button>
+              ) : (
+                <>
+                  <Link to="/register" style={{
+                    display: 'inline-block', padding: '11px 28px', borderRadius: 8,
+                    background: TEAL, color: '#080e1a', fontWeight: 700, fontSize: '0.9rem',
+                    textDecoration: 'none', transition: 'opacity 0.2s',
+                  }}
+                    onMouseEnter={e => e.target.style.opacity = '0.88'}
+                    onMouseLeave={e => e.target.style.opacity = '1'}
+                  >Create Account</Link>
+                  <Link to="/login" style={{
+                    display: 'inline-block', padding: '11px 24px', borderRadius: 8,
+                    background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.75)',
+                    border: `1px solid ${BORDER}`, fontWeight: 500, fontSize: '0.9rem',
+                    textDecoration: 'none', transition: 'border-color 0.2s',
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(0,212,170,0.3)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = BORDER}
+                  >Sign In</Link>
+                </>
+              )}
             </div>
           </div>
         </div>

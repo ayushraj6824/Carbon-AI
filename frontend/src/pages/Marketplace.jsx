@@ -94,7 +94,7 @@ export default function Marketplace() {
               </div>
             </CardContent>
 
-            <CardFooter className="pt-0">
+            <CardFooter>
               <Button variant="outline" className="w-full flex items-center justify-center gap-2">
                 Purchase Credits <ArrowRightIcon className="size-4" />
               </Button>
