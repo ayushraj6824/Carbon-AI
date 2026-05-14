@@ -66,7 +66,7 @@ router.post('/validate', protect, async (req, res) => {
 
     res.json({ claim, predictedEmission, anomalyScore, fraudProbability, confidenceScore, fraudRiskLevel, status });
   } catch (err) {
-    console.error('Validate Error:', err.message);
+    console.error('Validate Error:', err);
     if (err.code === 'ECONNREFUSED') {
       return res.status(503).json({ message: 'ML service unavailable. Ensure ML service is running on port 5001.' });
     }
