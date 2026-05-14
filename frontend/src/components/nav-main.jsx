@@ -6,10 +6,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 export function NavMain({ items }) {
   const location = useLocation()
+  const { setOpenMobile } = useSidebar()
 
   return (
     <SidebarGroup>
@@ -25,6 +27,7 @@ export function NavMain({ items }) {
                 <NavLink
                   to={item.url}
                   className="flex items-center gap-2 w-full"
+                  onClick={() => setOpenMobile(false)}
                 >
                   {item.icon}
                   <span>{item.title}</span>

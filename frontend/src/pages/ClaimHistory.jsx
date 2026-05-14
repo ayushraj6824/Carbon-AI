@@ -24,8 +24,6 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
 } from '@/components/ui/chart'
 
 const COLORS = [
@@ -98,7 +96,7 @@ export default function ClaimHistory() {
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="space-y-8">
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">Claim History</h1>
@@ -269,7 +267,6 @@ export default function ClaimHistory() {
                 />
                 <Bar dataKey="Claimed" fill="var(--color-Claimed)" radius={4} />
                 <Bar dataKey="Predicted" fill="var(--color-Predicted)" radius={4} />
-                <ChartLegend content={<ChartLegendContent />} />
               </BarChart>
             </ChartContainer>
           </CardContent>

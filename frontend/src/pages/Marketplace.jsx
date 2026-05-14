@@ -34,7 +34,7 @@ const STATS = [
 
 export default function Marketplace() {
   return (
-    <div className="p-6 space-y-8">
+    <div className="space-y-8">
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">Carbon Marketplace</h1>
