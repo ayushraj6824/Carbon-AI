@@ -9,7 +9,14 @@ if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5000", "http://localhost:5173"])
+CORS(app, origins=[
+    "http://localhost:5000",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://neuralcarbon.vercel.app",
+])
 
 
 @app.route('/health', methods=['GET'])

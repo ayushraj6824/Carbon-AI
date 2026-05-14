@@ -17,7 +17,6 @@ app.use(
       "http://localhost:3000",
       "http://localhost:3001",
       'https://neuralcarbon.vercel.app',
-      'http://neuralcarbon.vercel.app',
     ],
     credentials: true,
   }),
