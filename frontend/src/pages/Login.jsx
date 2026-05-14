@@ -1,117 +1,184 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { loginUser } from '../services/api'
-import { useAuth }   from '../context/AuthContext'
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+
+import { loginUser } from "../services/api"
+import { useAuth } from "../context/AuthContext"
+
+import {
+  LeafIcon,
+  AlertTriangleIcon,
+  Loader2Icon,
+  KeyRoundIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function Login() {
-  const { login }  = useAuth()
-  const navigate   = useNavigate()
-  const [form, setForm]   = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
+  const { login } = useAuth()
+  const navigate = useNavigate()
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  })
+
+  const [showPassword, setShowPassword] = useState(false)
+
+  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')
+
+    setError("")
     setLoading(true)
+
     try {
       const { data } = await loginUser(form)
+
       login(data.token, data.user)
-      navigate('/dashboard')
+
+      navigate("/dashboard")
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.')
+      setError(
+        err.response?.data?.message ||
+        "Login failed. Please try again."
+      )
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg,#0a0f1e 0%,#0d1b2a 60%,#0a1628 100%)' }}
-    >
-      {/* Background orbs */}
-      <div style={{ position:'fixed',top:'10%',left:'15%',width:400,height:400,
-        background:'radial-gradient(circle,rgba(0,212,170,0.08) 0%,transparent 70%)',
-        pointerEvents:'none' }} />
-      <div style={{ position:'fixed',bottom:'10%',right:'10%',width:300,height:300,
-        background:'radial-gradient(circle,rgba(0,100,200,0.08) 0%,transparent 70%)',
-        pointerEvents:'none' }} />
-
-      <div className="glass-card animate-fade-in w-full max-w-md p-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div
-            className="mx-auto mb-4"
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md border-border/50 shadow-xl pb-4">
+        <CardHeader className="space-y-4 text-center">
+          <Link
+            to="/"
+            className="mx-auto flex size-14 items-center justify-center rounded-2xl text-white shadow-lg"
             style={{
-              width:56,height:56,borderRadius:14,
-              background:'linear-gradient(135deg,#00d4aa,#00b896)',
-              display:'flex',alignItems:'center',justifyContent:'center',fontSize:28
+              background:
+                "linear-gradient(135deg, #00d4aa 0%, #00b896 100%)",
             }}
-          >🌱</div>
-          <h1 className="text-2xl font-bold text-white">Welcome Back</h1>
-          <p style={{ color:'rgba(255,255,255,0.45)',fontSize:'0.875rem',marginTop:4 }}>
-            Sign in to Carbon AI Validation System
-          </p>
-        </div>
-
-        {error && (
-          <div className="mb-5 px-4 py-3 rounded-xl text-sm"
-            style={{ background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.25)',color:'#f87171' }}>
-            ⚠️ {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color:'rgba(255,255,255,0.5)' }}>
-              EMAIL ADDRESS
-            </label>
-            <input
-              className="form-input"
-              type="email" name="email"
-              placeholder="company@example.com"
-              value={form.email}
-              onChange={handleChange}
-              required
-              id="login-email"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color:'rgba(255,255,255,0.5)' }}>
-              PASSWORD
-            </label>
-            <input
-              className="form-input"
-              type="password" name="password"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              required
-              id="login-password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="btn-primary mt-2 w-full"
-            disabled={loading}
-            id="login-submit"
           >
-            {loading ? '⏳ Signing in…' : '🔑 Sign In'}
-          </button>
-        </form>
-
-        <p className="text-center mt-6 text-sm" style={{ color:'rgba(255,255,255,0.4)' }}>
-          Don't have an account?{' '}
-          <Link to="/register" style={{ color:'#00d4aa',fontWeight:600,textDecoration:'none' }}>
-            Register
+            <LeafIcon className="size-7" />
           </Link>
-        </p>
-      </div>
+
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight">
+              Welcome Back
+            </h1>
+
+            <p className="text-sm text-muted-foreground">
+              Sign in to Carbon AI Validation System
+            </p>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-5">
+              <AlertTriangleIcon className="size-4" />
+
+              <AlertDescription>
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="login-email">
+                Email Address
+              </Label>
+
+              <Input
+                id="login-email"
+                type="email"
+                name="email"
+                placeholder="company@example.com"
+                value={form.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="login-password">
+                Password
+              </Label>
+
+              <div className="relative">
+                <Input
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="size-4" />
+                  ) : (
+                    <EyeIcon className="size-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2Icon className="mr-2 size-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <KeyRoundIcon className="mr-2 size-4" />
+                  Sign In
+                </>
+              )}
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <Link
+              to="/register"
+              className="font-medium text-primary hover:underline"
+            >
+              Register
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -1,18 +1,73 @@
-import { Navigate, Outlet } from 'react-router-dom'
-import { useAuth }          from '../context/AuthContext'
-import Sidebar              from './Sidebar'
-
+import { AppSidebar } from "@/components/app-sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
+import { useLocation, Outlet, Link, Navigate } from "react-router-dom"
+import { LeafIcon } from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
+ 
 export default function ProtectedRoute() {
-  const { token } = useAuth()
+  const { user, token } = useAuth()
+  const location = useLocation()
+  
+  if (!user || !token) {
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
 
-  if (!token) return <Navigate to="/login" replace />
+  const getPageTitle = (path) => {
+    switch (path) {
+      case "/dashboard": return "Dashboard"
+      case "/result": return "Validation Result"
+      case "/history": return "Claim History"
+      case "/marketplace": return "Marketplace"
+      default: return "Dashboard"
+    }
+  }
 
   return (
-    <div className="page-container">
-      <Sidebar />
-      <main className="main-content">
-        <Outlet />
-      </main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 bg-background/95 backdrop-blur border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link to="/" className="flex items-center gap-1">
+                      <LeafIcon className="h-4 w-4 text-blue-600" />
+                      <span className="hidden md:inline text-foreground font-medium">Carbon AI</span>
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{getPageTitle(location.pathname)}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <Outlet />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

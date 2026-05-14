@@ -1,34 +1,54 @@
-import { useNavigate }   from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell, RadialBarChart, RadialBar, Legend,
 } from 'recharts'
 import { useAuth } from '../context/AuthContext'
+import {
+  MicroscopeIcon,
+  CheckCircle2Icon,
+  AlertCircleIcon,
+  TargetIcon,
+  ClipboardListIcon,
+  LightbulbIcon,
+  BarChart3Icon,
+  SearchIcon,
+  RotateCcwIcon,
+  HistoryIcon,
+  ArrowLeftIcon
+} from "lucide-react"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 
 const MetricCard = ({ icon, label, value, sub, color = '#00d4aa' }) => (
   <div className="glass-card p-5">
     <div className="flex items-center gap-2 mb-3">
-      <span style={{ fontSize:20 }}>{icon}</span>
-      <span style={{ color:'rgba(255,255,255,0.45)',fontSize:'0.72rem',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em' }}>
+      {icon}
+      <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
         {label}
       </span>
     </div>
-    <p style={{ color, fontSize:'1.6rem', fontWeight:800, lineHeight:1 }}>{value}</p>
-    {sub && <p style={{ color:'rgba(255,255,255,0.4)',fontSize:'0.75rem',marginTop:4 }}>{sub}</p>}
+    <p style={{ color, fontSize: '1.6rem', fontWeight: 800, lineHeight: 1 }}>{value}</p>
+    {sub && <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: 4 }}>{sub}</p>}
   </div>
 )
 
 export default function ValidationResult() {
   const { lastResult } = useAuth()
-  const navigate       = useNavigate()
+  const navigate = useNavigate()
 
   if (!lastResult) {
     return (
-      <div className="animate-fade-in flex flex-col items-center justify-center" style={{ minHeight:'60vh' }}>
-        <div style={{ fontSize:64, marginBottom:16 }}>🔬</div>
-        <h2 className="text-white text-2xl font-bold mb-2">No Result Yet</h2>
-        <p style={{ color:'rgba(255,255,255,0.45)', marginBottom:24 }}>Submit a claim from the Dashboard first.</p>
-        <button className="btn-primary" onClick={() => navigate('/dashboard')}>← Go to Dashboard</button>
+      <div className="animate-fade-in flex flex-col items-center justify-center" style={{ minHeight: '60vh' }}>
+        <MicroscopeIcon className="size-16 mb-4 text-muted-foreground" />
+        <h2 className=" text-2xl font-bold mb-2">No Result Yet</h2>
+        <p style={{ color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}>Submit a claim from the Dashboard first.</p>
+        <button className="btn-primary flex items-center gap-2" onClick={() => navigate('/dashboard')}>
+          <ArrowLeftIcon className="size-4" /> Go to Dashboard
+        </button>
       </div>
     )
   }
@@ -39,28 +59,35 @@ export default function ValidationResult() {
   } = lastResult
 
   const isVerified = status === 'VERIFIED'
-  const accentColor  = isVerified ? '#4ade80' : '#f87171'
-  const accentBg     = isVerified ? 'rgba(34,197,94,0.08)'  : 'rgba(239,68,68,0.08)'
-  const accentBorder = isVerified ? 'rgba(34,197,94,0.25)'  : 'rgba(239,68,68,0.25)'
+  const accentColor = isVerified ? '#4ade80' : '#f87171'
+  const accentBg = isVerified ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)'
+  const accentBorder = isVerified ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'
 
   const emissionData = [
-    { name:'Claimed',   value: parseFloat(form?.claimedEmission) || 0, fill:'#facc15' },
-    { name:'Predicted', value: parseFloat(predictedEmission) || 0,     fill:'#00d4aa'  },
+    { name: 'Claimed', value: parseFloat(form?.claimedEmission) || 0, fill: 'hsl(var(--chart-1))' },
+    { name: 'Predicted', value: parseFloat(predictedEmission) || 0, fill: 'hsl(var(--chart-2))' },
   ]
+  const barChartConfig = {
+    Claimed: { label: 'Claimed', color: 'hsl(var(--chart-1))' },
+    Predicted: { label: 'Predicted', color: 'hsl(var(--chart-2))' },
+  }
   const safeConfidence = parseFloat(confidenceScore) || 0;
-  const gaugeData = [{ name:'Confidence', value: safeConfidence, fill: accentColor }]
+  const gaugeData = [{ name: 'Confidence', value: safeConfidence, fill: accentColor }]
 
   return (
     <div className="animate-fade-in">
       <div className="flex items-center gap-4 mb-8">
         <button onClick={() => navigate('/dashboard')}
-          style={{ background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',
-            borderRadius:8,padding:'8px 14px',color:'rgba(255,255,255,0.6)',cursor:'pointer',fontSize:'0.85rem' }}>
-          ← Back
+          style={{
+            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 8, padding: '8px 14px', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: '0.85rem',
+            display: 'flex', alignItems: 'center', gap: '8px'
+          }}>
+          <ArrowLeftIcon className="size-4" /> Back
         </button>
         <div>
-          <h1 className="text-3xl font-bold text-white">Validation Result</h1>
-          <p style={{ color:'rgba(255,255,255,0.45)',marginTop:2,fontSize:'0.875rem' }}>
+          <h1 className="text-3xl font-bold ">Validation Result</h1>
+          <p style={{ color: 'rgba(255,255,255,0.45)', marginTop: 2, fontSize: '0.875rem' }}>
             AI-powered anomaly detection analysis
           </p>
         </div>
@@ -69,34 +96,42 @@ export default function ValidationResult() {
       {/* Status Banner */}
       <div
         className="glass-card mb-8 p-7 animate-slide-up"
-        style={{ background: accentBg, border:`1px solid ${accentBorder}` }}
+        style={{ background: accentBg, border: `1px solid ${accentBorder}` }}
       >
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-5">
-            <div style={{ fontSize:56 }}>{isVerified ? '✅' : '🚨'}</div>
+            <div className="size-14 flex items-center justify-center">
+              {isVerified ? (
+                <CheckCircle2Icon className="size-12 text-green-400" />
+              ) : (
+                <AlertCircleIcon className="size-12 text-red-400" />
+              )}
+            </div>
             <div>
-              <div style={{ color: accentColor, fontSize:'0.8rem', fontWeight:700,
-                textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:4 }}>
+              <div style={{
+                color: accentColor, fontSize: '0.8rem', fontWeight: 700,
+                textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4
+              }}>
                 Claim Status
               </div>
-              <div style={{ color: accentColor, fontSize:'2.5rem', fontWeight:900, lineHeight:1 }}>
+              <div style={{ color: accentColor, fontSize: '2.5rem', fontWeight: 900, lineHeight: 1 }}>
                 {status}
               </div>
-              <div style={{ color:'rgba(255,255,255,0.5)',marginTop:6,fontSize:'0.875rem' }}>
+              <div style={{ color: 'rgba(255,255,255,0.5)', marginTop: 6, fontSize: '0.875rem' }}>
                 {isVerified
                   ? 'Claim is consistent with predicted emissions and within normal range.'
                   : 'Anomaly detected. Claim deviates significantly from ML prediction.'}
               </div>
             </div>
           </div>
-          <div style={{ textAlign:'right' }}>
-            <div style={{ color:'rgba(255,255,255,0.4)',fontSize:'0.72rem',marginBottom:4 }}>Fraud Risk Level</div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.72rem', marginBottom: 4 }}>Fraud Risk Level</div>
             <div style={{
-              padding:'8px 20px', borderRadius:8, fontWeight:700, fontSize:'1.2rem',
-              background: fraudRiskLevel==='Low' ? 'rgba(34,197,94,0.2)'
-                : fraudRiskLevel==='Medium' ? 'rgba(234,179,8,0.2)' : 'rgba(239,68,68,0.2)',
-              color: fraudRiskLevel==='Low' ? '#4ade80' : fraudRiskLevel==='Medium' ? '#facc15' : '#f87171',
-              border:`1px solid ${fraudRiskLevel==='Low' ? 'rgba(34,197,94,0.3)' : fraudRiskLevel==='Medium' ? 'rgba(234,179,8,0.3)' : 'rgba(239,68,68,0.3)'}`,
+              padding: '8px 20px', borderRadius: 8, fontWeight: 700, fontSize: '1.2rem',
+              background: fraudRiskLevel === 'Low' ? 'rgba(34,197,94,0.2)'
+                : fraudRiskLevel === 'Medium' ? 'rgba(234,179,8,0.2)' : 'rgba(239,68,68,0.2)',
+              color: fraudRiskLevel === 'Low' ? '#4ade80' : fraudRiskLevel === 'Medium' ? '#facc15' : '#f87171',
+              border: `1px solid ${fraudRiskLevel === 'Low' ? 'rgba(34,197,94,0.3)' : fraudRiskLevel === 'Medium' ? 'rgba(234,179,8,0.3)' : 'rgba(239,68,68,0.3)'}`,
             }}>
               {fraudRiskLevel} Risk
             </div>
@@ -105,57 +140,75 @@ export default function ValidationResult() {
       </div>
 
       {/* Metric Cards */}
-      <div className="grid gap-4 mb-8" style={{ gridTemplateColumns:'repeat(4,1fr)' }}>
-        <MetricCard icon="🎯" label="Predicted Emission" value={`${(parseFloat(predictedEmission) || 0).toFixed(2)} tCO₂e`} sub="ML Regression" color="#00d4aa" />
-        <MetricCard icon="📋" label="Claimed Emission"   value={`${(parseFloat(form?.claimedEmission) || 0).toFixed(2)} tCO₂e`} sub="Company reported" color="#facc15" />
-        <MetricCard icon="🔬" label="Anomaly Score"      value={`${((parseFloat(anomalyScore) || 0) * 100).toFixed(1)}%`} sub="IsolationForest" color={accentColor} />
-        <MetricCard icon="💡" label="Confidence Score"   value={`${(parseFloat(confidenceScore) || 0).toFixed(1)}%`}      sub="Model confidence" color="#a78bfa" />
+      <div className="grid gap-4 mb-8" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>
+        <MetricCard icon={<TargetIcon className="size-5" style={{ color: 'hsl(var(--chart-1))' }} />} label="Predicted Emission" value={`${(parseFloat(predictedEmission) || 0).toFixed(2)} tCO₂e`} sub="ML Regression" color="hsl(var(--chart-1))" />
+        <MetricCard icon={<ClipboardListIcon className="size-5" style={{ color: 'hsl(var(--chart-2))' }} />} label="Claimed Emission" value={`${(parseFloat(form?.claimedEmission) || 0).toFixed(2)} tCO₂e`} sub="Company reported" color="hsl(var(--chart-2))" />
+        <MetricCard icon={<MicroscopeIcon className="size-5" style={{ color: 'hsl(var(--chart-3))' }} />} label="Anomaly Score" value={`${((parseFloat(anomalyScore) || 0) * 100).toFixed(1)}%`} sub="IsolationForest" color="hsl(var(--chart-3))" />
+        <MetricCard icon={<LightbulbIcon className="size-5" style={{ color: 'hsl(var(--chart-4))' }} />} label="Confidence Score" value={`${(parseFloat(confidenceScore) || 0).toFixed(1)}%`} sub="Model confidence" color="hsl(var(--chart-4))" />
       </div>
 
       {/* Charts */}
       <div className="mb-8 max-w-4xl mx-auto">
         <div className="glass-card p-6">
-          <h3 className="text-white font-semibold mb-5 text-center">📊 Claimed vs Predicted Emission</h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={emissionData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={12} />
-              <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-              <Tooltip contentStyle={{ background:'#112240',border:'1px solid rgba(0,212,170,0.2)',borderRadius:8,color:'#fff' }}
-                formatter={(v) => [`${v.toFixed(4)} tCO₂e`]} />
-              <Bar dataKey="value" radius={[6,6,0,0]} barSize={100}>
-                {emissionData.map((e, i) => <Cell key={i} fill={e.fill} />)}
+          <h3 className=" font-semibold mb-5 text-center flex items-center justify-center gap-2">
+            <BarChart3Icon className="size-5" /> Claimed vs Predicted Emission
+          </h3>
+          <ChartContainer config={barChartConfig} className="h-[280px] w-full">
+            <BarChart accessibilityLayer data={emissionData}>
+              <CartesianGrid vertical={false} />
+              <XAxis 
+                dataKey="name" 
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
+                defaultIndex={1}
+              />
+              <Bar dataKey="value" radius={6}>
+                {emissionData.map((e, i) => (
+                  <Cell key={i} fill={e.fill} />
+                ))}
               </Bar>
             </BarChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         </div>
       </div>
 
       {/* Details table */}
       <div className="glass-card p-6">
-        <h3 className="text-white font-semibold mb-5">🔍 Submission Details</h3>
-        <div className="grid gap-3" style={{ gridTemplateColumns:'1fr 1fr', fontSize:'0.875rem' }}>
+        <h3 className=" font-semibold mb-5 flex items-center gap-2">
+          <SearchIcon className="size-5" /> Submission Details
+        </h3>
+        <div className="grid gap-3" style={{ gridTemplateColumns: '1fr 1fr', fontSize: '0.875rem' }}>
           {[
-            ['Sector',            form?.sector],
-            ['Industry',          form?.industrySector || '—'],
-            ['Transport Mode',    form?.transportMode],
-            ['Transport Distance',`${parseFloat(form?.transportDistance)?.toLocaleString()} km`],
-            ['Process Efficiency',`${form?.processEfficiency}%`],
-            ['Strategy',          form?.carbonReductionStrategy],
-          ].map(([k,v]) => (
+            ['Sector', form?.sector],
+            ['Industry', form?.industrySector || '—'],
+            ['Transport Mode', form?.transportMode],
+            ['Transport Distance', `${parseFloat(form?.transportDistance)?.toLocaleString()} km`],
+            ['Process Efficiency', `${form?.processEfficiency}%`],
+            ['Strategy', form?.carbonReductionStrategy],
+          ].map(([k, v]) => (
             <div key={k} className="flex justify-between items-center py-2"
-              style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
-              <span style={{ color:'rgba(255,255,255,0.4)' }}>{k}</span>
-              <span className="text-white font-medium">{v}</span>
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <span style={{ color: 'rgba(255,255,255,0.4)' }}>{k}</span>
+              <span className=" font-medium">{v}</span>
             </div>
           ))}
         </div>
         <div className="mt-6 flex gap-3">
-          <button className="btn-primary" onClick={() => navigate('/dashboard')}>🔄 New Claim</button>
+          <button className="btn-primary flex items-center gap-2" onClick={() => navigate('/dashboard')}>
+            <RotateCcwIcon className="size-4" /> New Claim
+          </button>
           <button onClick={() => navigate('/history')}
-            style={{ background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',
-              borderRadius:10,padding:'12px 20px',color:'rgba(255,255,255,0.7)',cursor:'pointer',fontSize:'0.9rem' }}>
-            📋 View History
+            style={{
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 10, padding: '12px 20px', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '0.9rem',
+              display: 'flex', alignItems: 'center', gap: '8px'
+            }}>
+            <HistoryIcon className="size-4" /> View History
           </button>
         </div>
       </div>

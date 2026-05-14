@@ -1,6 +1,22 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import LandingNavbar from '../components/LandingNavbar'
+import {
+  BarChart3Icon,
+  SearchIcon,
+  LockIcon,
+  ZapIcon,
+  FileJsonIcon,
+  DatabaseIcon,
+  KeyIcon,
+  WindIcon,
+  CodeIcon,
+  CpuIcon,
+  MicroscopeIcon,
+  CheckCircle2Icon,
+  LeafIcon,
+  ArrowRightIcon
+} from "lucide-react"
 
 /* ── Scroll-reveal hook ────────────────────────────────────────────────────── */
 function useReveal(threshold = 0.12) {
@@ -69,19 +85,19 @@ const H2 = ({ children, style = {} }) => (
 /* ── DATA ──────────────────────────────────────────────────────────────────── */
 const FEATURES = [
   {
-    icon: '📊',
+    icon: <BarChart3Icon className="size-8 text-teal-400" />,
     title: 'Emission Analysis',
     desc: 'Linear Regression models compute expected carbon emissions from six operational input dimensions. R² accuracy of 0.88 validated against 18,250 industry records.',
     tag: 'Regression · R² 0.88',
   },
   {
-    icon: '🔍',
+    icon: <SearchIcon className="size-8 text-teal-400" />,
     title: 'Anomaly Detection',
     desc: 'Isolation Forest algorithm identifies statistically anomalous claims. Configurable contamination thresholds adapt to sector-specific emission profiles.',
     tag: 'IsolationForest · 10% threshold',
   },
   {
-    icon: '🔐',
+    icon: <LockIcon className="size-8 text-teal-400" />,
     title: 'Validated Workflow',
     desc: 'End-to-end claim processing with JWT-secured API, role-based access control, persistent audit trail, and structured validation reports.',
     tag: 'JWT · MongoDB · REST API',
@@ -102,16 +118,16 @@ const STATS = [
 ]
 
 const TECH = [
-  ['⚛️', 'React 18'],
-  ['⚡', 'Vite'],
-  ['🟢', 'Node.js'],
-  ['🚂', 'Express'],
-  ['🍃', 'MongoDB'],
-  ['🐍', 'Flask'],
-  ['🔬', 'Scikit-learn'],
-  ['📈', 'Recharts'],
-  ['🔑', 'JWT'],
-  ['💨', 'Tailwind CSS'],
+  [<CodeIcon className="size-4" />, 'React 18'],
+  [<ZapIcon className="size-4" />, 'Vite'],
+  [<CpuIcon className="size-4" />, 'Node.js'],
+  [<CpuIcon className="size-4" />, 'Express'],
+  [<DatabaseIcon className="size-4" />, 'MongoDB'],
+  [<CpuIcon className="size-4" />, 'Flask'],
+  [<MicroscopeIcon className="size-4" />, 'Scikit-learn'],
+  [<BarChart3Icon className="size-4" />, 'Recharts'],
+  [<KeyIcon className="size-4" />, 'JWT'],
+  [<WindIcon className="size-4" />, 'Tailwind CSS'],
 ]
 
 const FOOTER_COLS = [
@@ -183,14 +199,14 @@ export default function LandingPage() {
           {/* CTAs */}
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 64 }}>
             <Link to="/register" style={{
-              display: 'inline-block', padding: '11px 26px', borderRadius: 8,
+              display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '11px 26px', borderRadius: 8,
               background: TEAL, color: '#080e1a', fontWeight: 700,
               fontSize: '0.9rem', textDecoration: 'none', letterSpacing: '-0.01em',
               transition: 'opacity 0.2s ease',
             }}
               onMouseEnter={e => e.target.style.opacity = '0.88'}
               onMouseLeave={e => e.target.style.opacity = '1'}
-            >Get Started →</Link>
+            >Get Started <ArrowRightIcon className="size-4" /></Link>
             <Link to="/login" style={{
               display: 'inline-block', padding: '11px 24px', borderRadius: 8,
               background: 'rgba(255,255,255,0.055)', color: 'rgba(255,255,255,0.8)',
@@ -235,7 +251,7 @@ export default function LandingPage() {
                   onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,212,170,0.22)'; e.currentTarget.style.transform = 'translateY(-3px)' }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.transform = 'translateY(0)' }}
                 >
-                  <div style={{ fontSize: 26, marginBottom: 18 }}>{f.icon}</div>
+                  <div style={{ marginBottom: 18 }}>{f.icon}</div>
                   <p style={{
                     display: 'inline-block', marginBottom: 12,
                     background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.15)',
@@ -388,7 +404,9 @@ export default function LandingPage() {
           {/* Brand */}
           <div style={{ maxWidth: 240 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 7, background: 'linear-gradient(135deg,#00d4aa,#009e80)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>🌱</div>
+              <div style={{ width: 28, height: 28, borderRadius: 7, background: 'linear-gradient(135deg,#00d4aa,#009e80)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>
+                <LeafIcon className="size-4 text-white" />
+              </div>
               <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.875rem' }}>Carbon<span style={{ color: TEAL }}>AI</span></span>
             </div>
             <p style={{ color: MUTED, fontSize: '0.78rem', lineHeight: 1.65 }}>

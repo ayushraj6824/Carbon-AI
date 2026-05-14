@@ -1,268 +1,538 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell, Legend
-} from 'recharts'
-import { validateClaim } from '../services/api'
-import { useAuth }       from '../context/AuthContext'
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts"
 
-const SECTORS    = ['Manufacturing','Energy','Transportation','Agriculture','Construction','Technology','Logistics','Retail']
+import { validateClaim } from "../services/api"
+import { useAuth } from "../context/AuthContext"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { 
+  BotIcon, 
+  LeafIcon, 
+  RadioIcon, 
+  FileTextIcon, 
+  Loader2Icon, 
+  ZapIcon, 
+  BarChart3Icon 
+} from "lucide-react"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
+
+const SECTORS = [
+  "Manufacturing",
+  "Energy",
+  "Transportation",
+  "Agriculture",
+  "Construction",
+  "Technology",
+  "Logistics",
+  "Retail",
+]
+
 const SUB_SECTORS = {
-  'Manufacturing': ['Steel Manufacturing', 'Cement', 'Textile', 'Automotive', 'Electronics'],
-  'Energy': ['Solar', 'Wind', 'Thermal', 'Hydro', 'Nuclear'],
-  'Transportation': ['Logistics', 'EV Fleet', 'Aviation', 'Maritime'],
-  'Agriculture': ['Crop Farming', 'Livestock', 'Forestry', 'Fertilizer Production'],
-  'Construction': ['Residential', 'Commercial', 'Infrastructure', 'Material Production'],
-  'Technology': ['Data Centers', 'Software Services', 'Hardware Manufacturing', 'Telecom'],
-  'Logistics': ['Warehousing', 'Freight Forwarding', 'Last-mile Delivery', 'Cold Chain'],
-  'Retail': ['E-commerce', 'Supermarkets', 'Apparel', 'Electronics Retail']
-};
-const MODES      = ['Truck','Air','Ship','Rail']
-const STRATEGIES = ['Energy Efficiency','Renewable Switch','Carbon Offset','Process Reengineering','Efficiency Upgrade','Carbon Tax Compliance']
-
-const INIT = {
-  sector:'Manufacturing', industrySector: SUB_SECTORS['Manufacturing'][0], energyConsumption:'',
-  renewableEnergy:'', nonRenewableEnergy:'', productionOutput:'',
-  rawMaterialUsage:'', transportDistance:'', transportMode:'Truck',
-  processEfficiency:'', carbonReductionStrategy:'Energy Efficiency',
-  claimedEmission:'',
+  Manufacturing: [
+    "Steel Manufacturing",
+    "Cement",
+    "Textile",
+    "Automotive",
+    "Electronics",
+  ],
+  Energy: ["Solar", "Wind", "Thermal", "Hydro", "Nuclear"],
+  Transportation: ["Logistics", "EV Fleet", "Aviation", "Maritime"],
+  Agriculture: [
+    "Crop Farming",
+    "Livestock",
+    "Forestry",
+    "Fertilizer Production",
+  ],
+  Construction: [
+    "Residential",
+    "Commercial",
+    "Infrastructure",
+    "Material Production",
+  ],
+  Technology: [
+    "Data Centers",
+    "Software Services",
+    "Hardware Manufacturing",
+    "Telecom",
+  ],
+  Logistics: [
+    "Warehousing",
+    "Freight Forwarding",
+    "Last-mile Delivery",
+    "Cold Chain",
+  ],
+  Retail: [
+    "E-commerce",
+    "Supermarkets",
+    "Apparel",
+    "Electronics Retail",
+  ],
 }
 
-const Label = ({ children }) => (
-  <label className="block text-xs font-semibold mb-1" style={{ color:'rgba(255,255,255,0.5)',letterSpacing:'0.05em' }}>
-    {children}
-  </label>
-)
+const MODES = ["Truck", "Air", "Ship", "Rail"]
+
+const STRATEGIES = [
+  "Energy Efficiency",
+  "Renewable Switch",
+  "Carbon Offset",
+  "Process Reengineering",
+  "Efficiency Upgrade",
+  "Carbon Tax Compliance",
+]
+
+const INIT = {
+  sector: "Manufacturing",
+  industrySector: SUB_SECTORS["Manufacturing"][0],
+  energyConsumption: "",
+  renewableEnergy: "",
+  nonRenewableEnergy: "",
+  productionOutput: "",
+  rawMaterialUsage: "",
+  transportDistance: "",
+  transportMode: "Truck",
+  processEfficiency: "",
+  carbonReductionStrategy: "Energy Efficiency",
+  claimedEmission: "",
+}
 
 export default function Dashboard() {
   const { user, saveResult } = useAuth()
   const navigate = useNavigate()
-  const [form, setForm]     = useState(INIT)
+
+  const [form, setForm] = useState(INIT)
   const [loading, setLoading] = useState(false)
-  const [error, setError]   = useState('')
+  const [error, setError] = useState("")
   const [chartData, setChartData] = useState(null)
 
-  const set = (e) => {
-    const { name, value } = e.target
-    if (name === 'sector') {
-      setForm(p => ({ ...p, sector: value, industrySector: SUB_SECTORS[value][0] }))
+  const updateField = (name, value) => {
+    if (name === "sector") {
+      setForm((prev) => ({
+        ...prev,
+        sector: value,
+        industrySector: SUB_SECTORS[value][0],
+      }))
     } else {
-      setForm(p => ({ ...p, [name]: value }))
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }))
     }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')
+
+    setError("")
     setLoading(true)
+
     try {
       const { data } = await validateClaim(form)
+
       saveResult({ ...data, form })
+
       setChartData({
         energy: [
-          { name:'Renewable',    value: parseFloat(form.renewableEnergy)    || 0 },
-          { name:'Non-Renewable',value: parseFloat(form.nonRenewableEnergy) || 0 },
+          {
+            name: "Renewable",
+            value: parseFloat(form.renewableEnergy) || 0,
+          },
+          {
+            name: "Non-Renewable",
+            value: parseFloat(form.nonRenewableEnergy) || 0,
+          },
         ],
         emission: [
-          { name:'Claimed',   value: parseFloat(form.claimedEmission) || 0 },
-          { name:'Predicted', value: parseFloat(data.predictedEmission) || 0 },
+          {
+            name: "Claimed",
+            value: parseFloat(form.claimedEmission) || 0,
+          },
+          {
+            name: "Predicted",
+            value: parseFloat(data.predictedEmission) || 0,
+          },
         ],
       })
-      navigate('/result')
+
+      navigate("/result")
     } catch (err) {
-      setError(err.response?.data?.message || 'Validation failed. Check that all services are running.')
+      setError(
+        err.response?.data?.message ||
+          "Validation failed. Check that all services are running."
+      )
     } finally {
       setLoading(false)
     }
   }
 
+  const energyChartConfig = {
+    Renewable: { label: 'Renewable', color: 'hsl(var(--chart-1))' },
+    NonRenewable: { label: 'Non-Renewable', color: 'hsl(var(--chart-2))' },
+  }
+
+  const emissionChartConfig = {
+    Claimed: { label: 'Claimed', color: 'hsl(var(--chart-1))' },
+    Predicted: { label: 'Predicted', color: 'hsl(var(--chart-2))' },
+  }
+
   return (
-    <div className="animate-fade-in">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Carbon Claim Dashboard</h1>
-        <p style={{ color:'rgba(255,255,255,0.45)', marginTop:4 }}>
-          Welcome, <span style={{ color:'#00d4aa' }}>{user?.name}</span> — submit operational data to validate your carbon credit claim.
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Carbon Claim Dashboard
+        </h1>
+
+        <p className="text-muted-foreground mt-2">
+          Welcome,{" "}
+          <span className="font-medium text-primary">
+            {user?.name}
+          </span>{" "}
+          — submit operational data to validate your carbon credit claim.
         </p>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-3 gap-4 mb-8" style={{ gridTemplateColumns:'repeat(3,1fr)' }}>
+      {/* Stats */}
+      <div className="grid gap-4 md:grid-cols-3">
         {[
-          { icon:'🤖', label:'AI Model',  value:'Active',  sub:'Isolation Forest' },
-          { icon:'🌱', label:'Algorithm', value:'IsoForest', sub:'Anomaly Detection' },
-          { icon:'📡', label:'ML Status', value:'Online',  sub:'Flask :5001' },
-        ].map(s => (
-          <div key={s.label} className="glass-card glass-card-hover p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <span style={{ fontSize:24 }}>{s.icon}</span>
-              <span style={{ color:'rgba(255,255,255,0.5)', fontSize:'0.78rem', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em' }}>
-                {s.label}
-              </span>
-            </div>
-            <p className="text-white font-bold text-lg">{s.value}</p>
-            <p style={{ color:'#00d4aa', fontSize:'0.75rem' }}>{s.sub}</p>
-          </div>
+          {
+            icon: <BotIcon className="size-6 text-primary" />,
+            label: "AI Model",
+            value: "Active",
+            sub: "Isolation Forest",
+          },
+          {
+            icon: <LeafIcon className="size-6 text-primary" />,
+            label: "Algorithm",
+            value: "IsoForest",
+            sub: "Anomaly Detection",
+          },
+          {
+            icon: <RadioIcon className="size-6 text-primary" />,
+            label: "ML Status",
+            value: "Online",
+            sub: "Flask :5001",
+          },
+        ].map((item) => (
+          <Card key={item.label}>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3">
+                {item.icon}
+
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {item.label}
+                  </p>
+
+                  <CardTitle className="text-lg">
+                    {item.value}
+                  </CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent>
+              <p className="text-sm text-primary">{item.sub}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
+      {/* Error */}
       {error && (
-        <div className="mb-6 px-4 py-3 rounded-xl text-sm"
-          style={{ background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.3)',color:'#f87171' }}>
-          ⚠️ {error}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
-      {/* Claim Form */}
-      <div className="glass-card p-8 mb-8">
-        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <span>📝</span> Carbon Credit Claim Form
-        </h2>
+      {/* Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileTextIcon className="size-5" /> Carbon Credit Claim Form
+          </CardTitle>
+        </CardHeader>
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-5" style={{ gridTemplateColumns:'repeat(2,1fr)' }}>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid gap-5 md:grid-cols-2">
+              {/* Sector */}
+              <div className="space-y-2">
+                <Label>Sector</Label>
 
-            {/* Sector */}
-            <div>
-              <Label>SECTOR</Label>
-              <select className="form-input" name="sector" value={form.sector} onChange={set} id="f-sector">
-                {SECTORS.map(s => <option key={s}>{s}</option>)}
-              </select>
+                <Select
+                  value={form.sector}
+                  onValueChange={(value) =>
+                    updateField("sector", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {SECTORS.map((sector) => (
+                      <SelectItem key={sector} value={sector}>
+                        {sector}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sub Sector */}
+              <div className="space-y-2">
+                <Label>Industry Sub-Sector</Label>
+
+                <Select
+                  value={form.industrySector}
+                  onValueChange={(value) =>
+                    updateField("industrySector", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {SUB_SECTORS[form.sector]?.map((item) => (
+                      <SelectItem key={item} value={item}>
+                        {item}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Inputs */}
+              {[
+                {
+                  label: "Total Energy Consumed (kWh)",
+                  name: "energyConsumption",
+                  placeholder: "150000",
+                },
+                {
+                  label: "Renewable Energy (kWh)",
+                  name: "renewableEnergy",
+                  placeholder: "60000",
+                },
+                {
+                  label: "Non-Renewable Energy (kWh)",
+                  name: "nonRenewableEnergy",
+                  placeholder: "90000",
+                },
+                {
+                  label: "Production Output (units)",
+                  name: "productionOutput",
+                  placeholder: "5000",
+                },
+                {
+                  label: "Raw Material Usage (kg)",
+                  name: "rawMaterialUsage",
+                  placeholder: "45000",
+                },
+                {
+                  label: "Transport Distance (km)",
+                  name: "transportDistance",
+                  placeholder: "2500",
+                },
+                {
+                  label: "Process Efficiency (%)",
+                  name: "processEfficiency",
+                  placeholder: "78",
+                },
+                {
+                  label: "Claimed Emissions (tCO2e)",
+                  name: "claimedEmission",
+                  placeholder: "28.5",
+                  step: "0.01",
+                },
+              ].map((field) => (
+                <div key={field.name} className="space-y-2">
+                  <Label>{field.label}</Label>
+
+                  <Input
+                    type="number"
+                    name={field.name}
+                    value={form[field.name]}
+                    placeholder={field.placeholder}
+                    onChange={(e) =>
+                      updateField(field.name, e.target.value)
+                    }
+                    min="0"
+                    step={field.step || "1"}
+                    required
+                  />
+                </div>
+              ))}
+
+              {/* Transport Mode */}
+              <div className="space-y-2">
+                <Label>Transport Mode</Label>
+
+                <Select
+                  value={form.transportMode}
+                  onValueChange={(value) =>
+                    updateField("transportMode", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {MODES.map((mode) => (
+                      <SelectItem key={mode} value={mode}>
+                        {mode}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Strategy */}
+              <div className="space-y-2">
+                <Label>Carbon Reduction Strategy</Label>
+
+                <Select
+                  value={form.carbonReductionStrategy}
+                  onValueChange={(value) =>
+                    updateField(
+                      "carbonReductionStrategy",
+                      value
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {STRATEGIES.map((strategy) => (
+                      <SelectItem
+                        key={strategy}
+                        value={strategy}
+                      >
+                        {strategy}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            {/* Industry Sub-Sector */}
-            <div>
-              <Label>INDUSTRY SUB-SECTOR</Label>
-              <select className="form-input" name="industrySector" value={form.industrySector} onChange={set} id="f-industry">
-                {SUB_SECTORS[form.sector]?.map(s => <option key={s}>{s}</option>)}
-              </select>
-            </div>
-
-            {/* Total Energy */}
-            <div>
-              <Label>TOTAL ENERGY CONSUMED (kWh)</Label>
-              <input className="form-input" type="number" name="energyConsumption" placeholder="e.g. 150000"
-                value={form.energyConsumption} onChange={set} required min="0" id="f-energy" />
-            </div>
-
-            {/* Renewable Energy */}
-            <div>
-              <Label>RENEWABLE ENERGY (kWh)</Label>
-              <input className="form-input" type="number" name="renewableEnergy" placeholder="e.g. 60000"
-                value={form.renewableEnergy} onChange={set} required min="0" id="f-renewable" />
-            </div>
-
-            {/* Non-Renewable Energy */}
-            <div>
-              <Label>NON-RENEWABLE ENERGY (kWh)</Label>
-              <input className="form-input" type="number" name="nonRenewableEnergy" placeholder="e.g. 90000"
-                value={form.nonRenewableEnergy} onChange={set} required min="0" id="f-nonrenewable" />
-            </div>
-
-            {/* Production Output */}
-            <div>
-              <Label>PRODUCTION OUTPUT (units)</Label>
-              <input className="form-input" type="number" name="productionOutput" placeholder="e.g. 5000"
-                value={form.productionOutput} onChange={set} required min="0" id="f-production" />
-            </div>
-
-            {/* Raw Material Usage */}
-            <div>
-              <Label>RAW MATERIAL USAGE (kg)</Label>
-              <input className="form-input" type="number" name="rawMaterialUsage" placeholder="e.g. 45000"
-                value={form.rawMaterialUsage} onChange={set} required min="0" id="f-rawmaterial" />
-            </div>
-
-            {/* Transport Distance */}
-            <div>
-              <Label>TRANSPORT DISTANCE (km)</Label>
-              <input className="form-input" type="number" name="transportDistance" placeholder="e.g. 2500"
-                value={form.transportDistance} onChange={set} required min="0" id="f-transport" />
-            </div>
-
-            {/* Transport Mode */}
-            <div>
-              <Label>TRANSPORT MODE</Label>
-              <select className="form-input" name="transportMode" value={form.transportMode} onChange={set} id="f-mode">
-                {MODES.map(m => <option key={m}>{m}</option>)}
-              </select>
-            </div>
-
-            {/* Process Efficiency */}
-            <div>
-              <Label>PROCESS EFFICIENCY (%)</Label>
-              <input className="form-input" type="number" name="processEfficiency" placeholder="e.g. 78"
-                value={form.processEfficiency} onChange={set} required min="0" max="100" id="f-efficiency" />
-            </div>
-
-            {/* Carbon Reduction Strategy */}
-            <div>
-              <Label>CARBON REDUCTION STRATEGY</Label>
-              <select className="form-input" name="carbonReductionStrategy" value={form.carbonReductionStrategy}
-                onChange={set} id="f-strategy">
-                {STRATEGIES.map(s => <option key={s}>{s}</option>)}
-              </select>
-            </div>
-
-            {/* Claimed Emissions */}
-            <div>
-              <Label>CLAIMED EMISSIONS (tCO2e)</Label>
-              <input className="form-input" type="number" name="claimedEmission" placeholder="e.g. 28.5"
-                value={form.claimedEmission} onChange={set} required min="0" step="0.01" id="f-claimed" />
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <button
+            <Button
               type="submit"
-              className="btn-primary w-full"
+              className="w-full"
               disabled={loading}
-              id="validate-btn"
-              style={{ padding:'16px', fontSize:'1rem', letterSpacing:'0.02em' }}
+              size="lg"
             >
-              {loading
-                ? '⏳ Running AI Validation…'
-                : '🤖 Validate Carbon Credit Claim'}
-            </button>
-          </div>
-        </form>
-      </div>
+              {loading ? (
+                <>
+                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  Running AI Validation...
+                </>
+              ) : (
+                <>
+                  <BotIcon className="mr-2 h-4 w-4" />
+                  Validate Carbon Credit Claim
+                </>
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      {/* Quick Charts if chartData exists */}
+      {/* Charts */}
       {chartData && (
-        <div className="grid gap-6" style={{ gridTemplateColumns:'1fr 1fr' }}>
-          <div className="glass-card p-6 animate-slide-up">
-            <h3 className="text-white font-semibold mb-4">⚡ Energy Breakdown</h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={chartData.energy}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={12} />
-                <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-                <Tooltip contentStyle={{ background:'#112240',border:'1px solid rgba(0,212,170,0.2)',borderRadius:8,color:'#fff' }} />
-                <Bar dataKey="value" radius={[4,4,0,0]}>
-                  <Cell fill="#00d4aa" />
-                  <Cell fill="#f87171" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Energy Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ZapIcon className="size-5" /> Energy Breakdown
+              </CardTitle>
+            </CardHeader>
 
-          <div className="glass-card p-6 animate-slide-up">
-            <h3 className="text-white font-semibold mb-4">📊 Emission Comparison</h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={chartData.emission}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={12} />
-                <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} />
-                <Tooltip contentStyle={{ background:'#112240',border:'1px solid rgba(0,212,170,0.2)',borderRadius:8,color:'#fff' }} />
-                <Bar dataKey="value" radius={[4,4,0,0]}>
-                  <Cell fill="#facc15" />
-                  <Cell fill="#00d4aa" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+            <CardContent>
+              <ChartContainer config={energyChartConfig} className="h-[250px] w-full">
+                <BarChart accessibilityLayer data={chartData.energy}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent />}
+                    defaultIndex={1}
+                  />
+                  <Bar dataKey="value" radius={8}>
+                    <Cell fill="hsl(var(--chart-1))" />
+                    <Cell fill="hsl(var(--chart-2))" />
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Emission Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3Icon className="size-5" /> Emission Comparison
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <ChartContainer config={emissionChartConfig} className="h-[250px] w-full">
+                <BarChart accessibilityLayer data={chartData.emission}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent />}
+                    defaultIndex={1}
+                  />
+                  <Bar dataKey="value" radius={8}>
+                    <Cell fill="hsl(var(--chart-1))" />
+                    <Cell fill="hsl(var(--chart-2))" />
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { 
+  LeafIcon, 
+  MenuIcon, 
+  XIcon 
+} from "lucide-react"
 
 const LINKS = [
   { label: 'Platform',   href: '#features'  },
@@ -53,8 +58,10 @@ export default function LandingNavbar() {
               width: 30, height: 30, borderRadius: 7,
               background: 'linear-gradient(135deg,#00d4aa,#009e80)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 15, flexShrink: 0,
-            }}>🌱</div>
+              flexShrink: 0,
+            }}>
+              <LeafIcon className="size-4 text-white" />
+            </div>
             <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem', letterSpacing: '-0.01em' }}>
               Carbon<span style={{ color: '#00d4aa' }}>AI</span>
             </span>
@@ -114,9 +121,11 @@ export default function LandingNavbar() {
           <button
             className="show-mobile"
             onClick={() => setMenuOpen(o => !o)}
-            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 20, padding: 4 }}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 4 }}
             aria-label="Toggle navigation"
-          >{menuOpen ? '✕' : '☰'}</button>
+          >
+            {menuOpen ? <XIcon className="size-6" /> : <MenuIcon className="size-6" />}
+          </button>
         </div>
 
         {/* Mobile drawer */}
