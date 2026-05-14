@@ -27,13 +27,16 @@ app.get('/api/health', (_req, res) => {
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/carbon_ai';
 const PORT      = process.env.PORT        || 5000;
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    console.log('✅ MongoDB connected');
+(async () => {
+  const { default: ora } = await import('ora');
+  const mongoSpinner = ora('Connecting to MongoDB...').start();
+
+  try {
+    await mongoose.connect(MONGO_URI);
+    mongoSpinner.succeed('✅ MongoDB connected');
     app.listen(PORT, () => console.log(`🚀 Backend running on http://localhost:${PORT}`));
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection error:', err.message);
+  } catch (err) {
+    mongoSpinner.fail(`❌ MongoDB connection error: ${err.message}`);
     process.exit(1);
-  });
+  }
+})();
