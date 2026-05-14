@@ -228,6 +228,6 @@ We welcome contributions from collaborators! To contribute:
 
 ## 👨‍💻 Author & License
 
-Developed for the MCA Major Project by **Ayush**.
+Developed for the MCA Major Project by **Ayush** .
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
