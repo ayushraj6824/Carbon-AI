@@ -17,7 +17,7 @@ export const registerUser = (data) => api.post('/auth/register', data)
 
 // ── Claims ────────────────────────────────────────────────────────────────────
 export const validateClaim = (data) => api.post('/claims/validate', data)
-export const getHistory    = ()     => api.get('/claims/history')
+export const getHistory    = (page = 1, limit = 10) => api.get(`/claims/history?page=${page}&limit=${limit}`)
 export const getStats      = ()     => api.get('/claims/stats')
 export const deleteClaim   = (id)   => api.delete(`/claims/${id}`)
 

@@ -29,16 +29,16 @@
     --border: 0 0.09% 89.82%;
     --input: 0 0.09% 89.82%;
     --ring: 0 0.02% 63.02%;
-    --color-blue-300: 199 89% 48%;
-    --color-blue-500: 201 96% 32%;
-    --color-blue-600: 205 79% 30%;
-    --color-blue-700: 209 62% 28%;
-    --color-blue-800: 215 50% 23%;
-    --chart-1: var(--color-blue-300);
-    --chart-2: var(--color-blue-500);
-    --chart-3: var(--color-blue-600);
-    --chart-4: var(--color-blue-700);
-    --chart-5: var(--color-blue-800);
+    --color-amber-300: 45 93% 66%;
+    --color-amber-500: 38 92% 50%;
+    --color-amber-600: 35 92% 43%;
+    --color-amber-700: 31 92% 35%;
+    --color-amber-800: 29 84% 30%;
+    --chart-1: var(--color-amber-300);
+    --chart-2: var(--color-amber-500);
+    --chart-3: var(--color-amber-600);
+    --chart-4: var(--color-amber-700);
+    --chart-5: var(--color-amber-800);
     --sidebar-background: 0 0.5% 98.03%;
     --sidebar-foreground: 0 0.02% 3.94%;
     --sidebar-primary: 218.82deg 34.69% 9.61%;
@@ -109,17 +109,17 @@
     --ring: 210 90% 60%;
 
     /* Existing Blues untouched */
-    --color-blue-300: 199 89% 48%;
-    --color-blue-500: 201 96% 32%;
-    --color-blue-600: 205 79% 30%;
-    --color-blue-700: 209 62% 28%;
-    --color-blue-800: 215 50% 23%;
+    --color-amber-300: 45 93% 66%;
+    --color-amber-500: 38 92% 50%;
+    --color-amber-600: 35 92% 43%;
+    --color-amber-700: 31 92% 35%;
+    --color-amber-800: 29 84% 30%;
 
-    --chart-1: var(--color-blue-300);
-    --chart-2: var(--color-blue-500);
-    --chart-3: var(--color-blue-600);
-    --chart-4: var(--color-blue-700);
-    --chart-5: var(--color-blue-800);
+    --chart-1: var(--color-amber-300);
+    --chart-2: var(--color-amber-500);
+    --chart-3: var(--color-amber-600);
+    --chart-4: var(--color-amber-700);
+    --chart-5: var(--color-amber-800);
 
     /* Sidebar */
     --sidebar-background: 221 42% 10%;

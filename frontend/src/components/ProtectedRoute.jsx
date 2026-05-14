@@ -48,13 +48,13 @@ export default function ProtectedRoute() {
                 orientation="vertical"
                 className="mr-2 data-[orientation=vertical]:h-4"
               />
-              <Breadcrumb className="hidden sm:block">
+              <Breadcrumb className="">
                 <BreadcrumbList>
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
                       <Link to="/" className="flex items-center gap-1">
                         <LeafIcon className="h-4 w-4 text-primary" />
-                        <span className="hidden md:inline text-foreground font-medium">Carbon AI</span>
+                        <span className="inline text-muted-foreground font-normal transition-colors hover:text-foreground">Carbon AI</span>
                       </Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
@@ -64,18 +64,9 @@ export default function ProtectedRoute() {
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
-
-              {/* Mobile Title */}
-              <div className="sm:hidden flex items-center gap-2">
-                <LeafIcon className="h-4 w-4 text-primary" />
-                <span className="text-sm font-bold truncate max-w-[120px]">
-                  {getPageTitle(location.pathname)}
-                </span>
-              </div>
             </div>
 
             <div className="flex items-center gap-4">
-              {/* Optional: Add user avatar or search here if needed */}
               <div className="hidden xs:flex items-center gap-2 text-xs text-muted-foreground">
                 <div className="size-2 rounded-full bg-green-500 animate-pulse" />
                 AI Online

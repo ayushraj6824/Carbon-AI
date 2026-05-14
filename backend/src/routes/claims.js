@@ -81,11 +81,23 @@ router.post('/validate', protect, async (req, res) => {
 // ── GET /api/claims/history ──────────────────────────────────────────────
 router.get('/history', protect, async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const total = await Claim.countDocuments({ userId: req.user._id });
     const claims = await Claim.find({ userId: req.user._id })
       .sort({ createdAt: -1 })
-      .limit(100)
+      .skip(skip)
+      .limit(limit)
       .lean();
-    res.json(claims);
+
+    res.json({
+      claims,
+      total,
+      page,
+      pages: Math.ceil(total / limit)
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

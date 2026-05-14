@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  PieChart, Pie, Cell, Legend,
-  BarChart, Bar, CartesianGrid, XAxis,
+  PieChart, Pie, Cell, Legend, Label,
+  BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList,
 } from 'recharts'
 import {
   PackageIcon, CheckCircle2Icon, AlertCircleIcon,
@@ -12,7 +12,7 @@ import {
   AlertTriangleIcon, InboxIcon, Trash2Icon, BarChart3Icon,
   TrendingUpIcon,
 } from 'lucide-react'
-import { getHistory, deleteClaim } from '../services/api'
+import { getHistory, deleteClaim, getStats } from '../services/api'
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -24,6 +24,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
 } from '@/components/ui/chart'
 
 const COLORS = [
@@ -55,13 +57,27 @@ export default function ClaimHistory() {
   const [claims, setClaims] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
+  const [stats, setStats] = useState({ total: 0, verified: 0, suspicious: 0, sectorMap: {} })
 
-  useEffect(() => { fetchHistory() }, [])
+  useEffect(() => {
+    fetchHistory(1)
+    fetchStats()
+  }, [])
 
-  const fetchHistory = () => {
+  const fetchStats = () => {
+    getStats().then(({ data }) => setStats(data)).catch(console.error)
+  }
+
+  const fetchHistory = (p = 1) => {
     setLoading(true)
-    getHistory()
-      .then(({ data }) => setClaims(data))
+    getHistory(p)
+      .then(({ data }) => {
+        setClaims(prev => p === 1 ? data.claims : [...prev, ...data.claims])
+        setPage(data.page)
+        setHasMore(data.page < data.pages)
+      })
       .catch(() => setError('Failed to load history.'))
       .finally(() => setLoading(false))
   }
@@ -76,24 +92,20 @@ export default function ClaimHistory() {
     }
   }
 
+  const loadMore = () => fetchHistory(page + 1)
+
   const recentCompareData = claims.slice(0, 5).map((c, i) => ({
     name: new Date(c.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) + (i > 0 ? ` (${i})` : ''),
     Claimed: c.claimedEmission || 0,
     Predicted: c.predictedEmission || 0,
   })).reverse()
 
-  const sectorData = Object.entries(
-    claims.reduce((acc, c) => {
-      acc[c.sector] = (acc[c.sector] || 0) + (c.claimedEmission || 0)
-      return acc
-    }, {})
-  ).map(([name, value]) => ({ name, value: parseFloat(value.toFixed(2)) }))
+  const sectorData = Object.entries(stats.sectorMap || {})
+    .map(([name, value]) => ({ name, value: parseFloat(Number(value).toFixed(2)) }))
 
-  const stats = {
-    total: claims.length,
-    verified: claims.filter(c => c.status === 'VERIFIED').length,
-    suspicious: claims.filter(c => c.status === 'SUSPICIOUS').length,
-  }
+  const totalEmissions = useMemo(() => {
+    return sectorData.reduce((acc, curr) => acc + curr.value, 0)
+  }, [sectorData])
 
   return (
     <div className="space-y-8">
@@ -136,28 +148,54 @@ export default function ClaimHistory() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={{}} className="h-[280px] w-full">
+              <ChartContainer config={{}} className="mx-auto aspect-square max-h-[280px]">
                 <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel formatter={(v) => [`${v} tCO₂e`]} />}
+                  />
                   <Pie
                     data={sectorData}
                     dataKey="value"
                     nameKey="name"
-                    cx="50%" cy="50%"
-                    outerRadius={90} innerRadius={50}
-                    paddingAngle={3}
+                    innerRadius={60}
+                    outerRadius={80}
+                    strokeWidth={5}
                   >
                     {sectorData.map((_, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
                     ))}
+                    <Label
+                      content={({ viewBox }) => {
+                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                          return (
+                            <text
+                              x={viewBox.cx}
+                              y={viewBox.cy}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                            >
+                              <tspan
+                                x={viewBox.cx}
+                                y={viewBox.cy}
+                                className="fill-foreground text-2xl font-bold"
+                              >
+                                {totalEmissions.toLocaleString()}
+                              </tspan>
+                              <tspan
+                                x={viewBox.cx}
+                                y={(viewBox.cy || 0) + 24}
+                                className="fill-muted-foreground text-xs"
+                              >
+                                Total tCO₂e
+                              </tspan>
+                            </text>
+                          )
+                        }
+                      }}
+                    />
                   </Pie>
-                  <ChartTooltip
-                    content={<ChartTooltipContent formatter={(v) => [`${v} tCO₂e`]} />}
-                  />
-                  <Legend
-                    formatter={(v) => (
-                      <span className="text-xs text-muted-foreground">{v}</span>
-                    )}
-                  />
+                  <ChartLegend content={<ChartLegendContent className="-mt-4" />} />
                 </PieChart>
               </ChartContainer>
             </CardContent>
@@ -192,49 +230,59 @@ export default function ClaimHistory() {
               </div>
             )}
             {!loading && claims.length > 0 && (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Sector</TableHead>
-                      <TableHead>Claimed (tCO₂e)</TableHead>
-                      <TableHead>Predicted (tCO₂e)</TableHead>
-                      <TableHead>Confidence</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {claims.map(c => (
-                      <TableRow key={c._id}>
-                        <TableCell className="text-sm">
-                          {new Date(c.createdAt).toLocaleDateString('en-IN')}
-                        </TableCell>
-                        <TableCell className="text-sm">{c.sector}</TableCell>
-                        <TableCell className="text-sm font-mono">{fmt(c.claimedEmission)}</TableCell>
-                        <TableCell className="text-sm font-mono">{fmt(c.predictedEmission)}</TableCell>
-                        <TableCell className="text-sm font-mono">{fmtPct(c.confidenceScore)}</TableCell>
-                        <TableCell>
-                          <Badge variant={statusVariant(c.status)} className="text-xs">
-                            {c.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={() => handleDelete(c._id)}
-                            title="Delete Claim"
-                          >
-                            <Trash2Icon className="size-4" />
-                          </Button>
-                        </TableCell>
+              <div className="space-y-4">
+                <div className="overflow-y-auto max-h-[500px] border rounded-md">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-background z-10">
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Sector</TableHead>
+                        <TableHead>Claimed (tCO₂e)</TableHead>
+                        <TableHead>Predicted (tCO₂e)</TableHead>
+                        <TableHead>Confidence</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {claims.map(c => (
+                        <TableRow key={c._id}>
+                          <TableCell className="text-sm">
+                            {new Date(c.createdAt).toLocaleDateString('en-IN')}
+                          </TableCell>
+                          <TableCell className="text-sm">{c.sector}</TableCell>
+                          <TableCell className="text-sm font-mono">{fmt(c.claimedEmission)}</TableCell>
+                          <TableCell className="text-sm font-mono">{fmt(c.predictedEmission)}</TableCell>
+                          <TableCell className="text-sm font-mono">{fmtPct(c.confidenceScore)}</TableCell>
+                          <TableCell>
+                            <Badge variant={statusVariant(c.status)} className="text-xs">
+                              {c.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDelete(c._id)}
+                              title="Delete Claim"
+                            >
+                              <Trash2Icon className="size-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                {hasMore && (
+                  <div className="flex justify-center pt-2">
+                    <Button variant="outline" size="sm" onClick={loadMore} disabled={loading}>
+                      {loading ? <Loader2Icon className="size-4 animate-spin mr-2" /> : null}
+                      Load More
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
@@ -259,12 +307,13 @@ export default function ClaimHistory() {
                   tickLine={false}
                   tickMargin={10}
                   axisLine={false}
-                  tickFormatter={(value) => value.split(' ')[0]}
+                  hide
                 />
                 <ChartTooltip
                   cursor={false}
                   content={<ChartTooltipContent />}
                 />
+                <ChartLegend content={<ChartLegendContent />} />
                 <Bar dataKey="Claimed" fill="var(--color-Claimed)" radius={4} />
                 <Bar dataKey="Predicted" fill="var(--color-Predicted)" radius={4} />
               </BarChart>
